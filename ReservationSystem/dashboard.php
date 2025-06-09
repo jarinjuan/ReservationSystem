@@ -1,14 +1,11 @@
 <?php
-// Začátek session
 session_start();
 
-// Kontrola, zda je uživatel přihlášen
 if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
     header("location: index.php");
     exit;
 }
 
-// Připojení k databázi
 require_once 'assets/database.php';
 $conn = connectionDB();
 ?>
@@ -150,10 +147,10 @@ $conn = connectionDB();
             
             <div class="actions">
                 <?php if($_SESSION["role"] == 'Reader'): ?>
-                    <!-- Reader může pouze zobrazovat všechny rezervace -->
+                  
                     <a href="view-all-reservations.php" class="button">Zobrazit všechny rezervace</a>
                 <?php else: ?>
-                    <!-- Ostatní role mohou spravovat své rezervace -->
+               
                     <a href="my-reservations.php" class="button">Moje rezervace</a>
                     <a href="create-reservation.php" class="button">Vytvořit rezervaci</a>
                     <?php if(strtolower($_SESSION["role"]) == 'admin' || $_SESSION["role"] == 'Admin' || $_SESSION["role"] == 'adminek' || $_SESSION["role"] == 'Approver'): ?>
