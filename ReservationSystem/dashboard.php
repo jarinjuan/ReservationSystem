@@ -117,6 +117,14 @@ $conn = connectionDB();
         .button.logout:hover {
             background-color: #c0392b;
         }
+
+        .button.admin {
+            background-color: #8e44ad;
+        }
+
+        .button.admin:hover {
+            background-color: #9b59b6;
+        }
     </style>
 </head>
 <body>
@@ -134,11 +142,27 @@ $conn = connectionDB();
         <div class="dashboard-content">
             <h2>Vítejte v systému rezervací</h2>
             <p>Jste úspěšně přihlášen jako <strong><?php echo htmlspecialchars($_SESSION["username"]); ?></strong> s rolí <strong><?php echo htmlspecialchars($_SESSION["role"]); ?></strong>.</p>
-            <p>Zde můžete spravovat vaše rezervace a nastavení.</p>
+            <?php if($_SESSION["role"] == 'Reader'): ?>
+                <p>Jako Reader můžete prohlížet všechny rezervace v systému.</p>
+            <?php else: ?>
+                <p>Zde můžete spravovat vaše rezervace a nastavení.</p>
+            <?php endif; ?>
             
             <div class="actions">
-                <a href="#" class="button">Moje rezervace</a>
-                <a href="#" class="button">Vytvořit rezervaci</a>
+                <?php if($_SESSION["role"] == 'Reader'): ?>
+                    <!-- Reader může pouze zobrazovat všechny rezervace -->
+                    <a href="view-all-reservations.php" class="button">Zobrazit všechny rezervace</a>
+                <?php else: ?>
+                    <!-- Ostatní role mohou spravovat své rezervace -->
+                    <a href="my-reservations.php" class="button">Moje rezervace</a>
+                    <a href="create-reservation.php" class="button">Vytvořit rezervaci</a>
+                    <?php if(strtolower($_SESSION["role"]) == 'admin' || $_SESSION["role"] == 'Admin' || $_SESSION["role"] == 'adminek' || $_SESSION["role"] == 'Approver'): ?>
+                        <a href="approve-reservations.php" class="button admin">Schválit rezervace</a>
+                    <?php endif; ?>
+                    <?php if(strtolower($_SESSION["role"]) == 'admin' || $_SESSION["role"] == 'Admin' || $_SESSION["role"] == 'adminek'): ?>
+                        <a href="add-classroom.php" class="button admin">Přidat učebny</a>
+                    <?php endif; ?>
+                <?php endif; ?>
                 <a href="logout.php" class="button logout">Odhlásit se</a>
             </div>
         </div>

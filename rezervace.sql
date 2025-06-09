@@ -28,6 +28,11 @@ SET time_zone = "+00:00";
 -- Struktura tabulky `classrooms`
 --
 
+CREATE DATABASE IF NOT EXISTS rezervace;
+USE rezervace;
+
+
+
 CREATE TABLE `classrooms` (
   `id` int(11) NOT NULL,
   `description` varchar(255) COLLATE utf8_czech_ci DEFAULT NULL
