@@ -22,16 +22,14 @@ SET time_zone = "+00:00";
 -- Databáze: `rezervace`
 --
 
+CREATE DATABASE IF NOT EXISTS rezervace;
+USE rezervace;
+
 -- --------------------------------------------------------
 
 --
 -- Struktura tabulky `classrooms`
 --
-
-CREATE DATABASE IF NOT EXISTS rezervace;
-USE rezervace;
-
-
 
 CREATE TABLE `classrooms` (
   `id` int(11) NOT NULL,
@@ -48,9 +46,10 @@ CREATE TABLE `reservations` (
   `id` int(11) NOT NULL,
   `classroom_id` int(11) DEFAULT NULL,
   `user_id` int(11) NOT NULL,
-  `time_created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `time_started` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `time_ended` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  -- Zde je změna: time_created zůstává, ale time_started a time_ended budou NULL a DEFAULT NULL
+  `time_created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Odebráno ON UPDATE CURRENT_TIMESTAMP, pokud to není požadované
+  `time_started` timestamp NULL DEFAULT NULL, -- Změněno z NOT NULL DEFAULT '0000-00-00 00:00:00'
+  `time_ended` timestamp NULL DEFAULT NULL,   -- Změněno z NOT NULL DEFAULT '0000-00-00 00:00:00'
   `status` varchar(255) COLLATE utf8_czech_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_czech_ci;
 
@@ -78,7 +77,7 @@ INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES
 (4, '4', '$2y$10$jSlrn7uL1W3QsPJHWeWdpuPLXIRKywszQKSH25t1KPTRJHy1vf3hq', 'Reader'),
 (5, '7', '$2y$10$FiN1Ve.KdMcl8CCaOVbCSuHzX865sleY6uc43iUGVN8muzK3SOSpu', 'Customer'),
 (6, '10', '$2y$10$pwWFCyIEcrB.Q5q5V2/4OuGVOiJu6gY/Z6F8DAK3esGg9cybxkrvy', 'Approver'),
-(7, 'xdd', '$2y$10$IZtPGWWP7MOCRCmA0Uml3uXLLzAvE09bnBUEqz/iV7UMo0bDqAryW', 'Approver');
+(7, 'xdd', '$2y$10$IZtPGWWP7MOCRCmA0Uml3uXLLcAvE09bnBUEqz/iV7UMo0bDqAryW', 'Approver');
 
 --
 -- Klíče pro exportované tabulky

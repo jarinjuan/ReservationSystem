@@ -1,24 +1,19 @@
 <?php
-// Začátek session
 session_start();
 
-// Kontrola, zda je uživatel přihlášen
 if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
     header("location: index.php");
     exit;
 }
 
-// Kontrola, zda má uživatel Reader práva
 if($_SESSION["role"] != 'Reader'){
     header("location: dashboard.php");
     exit;
 }
 
-// Připojení k databázi
 require_once 'assets/database.php';
 $conn = connectionDB();
 
-// Načtení všech rezervací
 $sql = "SELECT r.id, r.time_created, r.time_started, r.time_ended, r.status, 
                c.description as classroom_name, u.username
         FROM reservations r 
@@ -32,12 +27,10 @@ if ($result) {
     $reservations = mysqli_fetch_all($result, MYSQLI_ASSOC);
 }
 
-// Funkce pro formátování data
 function formatDateTime($datetime) {
     return date('d.m.Y H:i', strtotime($datetime));
 }
 
-// Funkce pro překlad statusu
 function translateStatus($status) {
     switch($status) {
         case 'pending': return 'Čekající';
@@ -47,7 +40,6 @@ function translateStatus($status) {
     }
 }
 
-// Funkce pro CSS třídu statusu
 function getStatusClass($status) {
     switch($status) {
         case 'pending': return 'status-pending';
@@ -67,8 +59,36 @@ function getStatusClass($status) {
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
-    <title>Všechny rezervace - Reservation System</title>
+    <link rel="stylesheet" href="assets/discord-style.css">
+    <title>Všechny rezervace - Rezervační systém</title>
     <style>
+        .reservations-grid {
+            display: grid;
+            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+        }
+
+        .user-name {
+            color: #5865f2;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .no-reservations {
+            text-align: center;
+            padding: 3rem;
+            color: #b9bbbe;
+        }
+
+        .no-reservations h3 {
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .reservations-grid {
+                grid-template-columns: 1fr;
+            }
+        }
         * {
             margin: 0;
             padding: 0;
@@ -288,7 +308,7 @@ function getStatusClass($status) {
                     <p>V databázi nejsou žádné rezervace.</p>
                 </div>
             <?php else: ?>
-                <!-- Statistiky -->
+            
                 <div class="stats">
                     <div class="stat-card">
                         <div class="stat-number"><?php echo count($reservations); ?></div>
@@ -308,7 +328,6 @@ function getStatusClass($status) {
                     </div>
                 </div>
 
-                <!-- Seznam rezervací -->
                 <div class="reservations-grid">
                     <?php foreach($reservations as $reservation): ?>
                         <div class="reservation-card">

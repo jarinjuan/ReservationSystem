@@ -1,57 +1,47 @@
 <?php
-// Začátek session
 session_start();
 
-// Kontrola, zda je uživatel přihlášen
 if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
     header("location: index.php");
     exit;
 }
 
-// Kontrola, zda má uživatel admin práva
 $user_role = strtolower($_SESSION["role"]);
 if($user_role != 'admin' && $_SESSION["role"] != 'Admin' && $_SESSION["role"] != 'adminek'){
     header("location: dashboard.php");
     exit;
 }
-
-// Připojení k databázi
 require_once 'assets/database.php';
 $conn = connectionDB();
 
 $error = "";
 $success = "";
 
-// Zpracování formuláře
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["add_classroom"])) {
     $description = trim($_POST["description"]);
-    
-    // Základní validace
+
     if (empty($description)) {
         $error = "Prosím zadejte popis učebny.";
     } else {
-        // Kontrola, zda učebna s tímto popisem již neexistuje
         $check_sql = "SELECT id FROM classrooms WHERE description = ?";
         $check_stmt = mysqli_prepare($conn, $check_sql);
-        
+
         if ($check_stmt) {
             mysqli_stmt_bind_param($check_stmt, "s", $description);
             mysqli_stmt_execute($check_stmt);
             mysqli_stmt_store_result($check_stmt);
-            
+
             if (mysqli_stmt_num_rows($check_stmt) > 0) {
                 $error = "Učebna s tímto popisem již existuje.";
             } else {
-                // Vložení nové učebny
                 $insert_sql = "INSERT INTO classrooms (description) VALUES (?)";
                 $insert_stmt = mysqli_prepare($conn, $insert_sql);
-                
+
                 if ($insert_stmt) {
                     mysqli_stmt_bind_param($insert_stmt, "s", $description);
-                    
+
                     if (mysqli_stmt_execute($insert_stmt)) {
                         $success = "Učebna byla úspěšně přidána!";
-                        // Vyčistit formulář
                         $description = "";
                     } else {
                         $error = "Něco se pokazilo při přidávání učebny.";
@@ -66,7 +56,42 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
-// Načtení všech existujících učeben
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["delete_classroom"])) {
+    $classroom_id = intval($_POST["classroom_id"]);
+
+    if ($classroom_id > 0) {
+        $check_reservations_sql = "SELECT COUNT(*) as count FROM reservations WHERE classroom_id = ?";
+        $check_reservations_stmt = mysqli_prepare($conn, $check_reservations_sql);
+
+        if ($check_reservations_stmt) {
+            mysqli_stmt_bind_param($check_reservations_stmt, "i", $classroom_id);
+            mysqli_stmt_execute($check_reservations_stmt);
+            $result = mysqli_stmt_get_result($check_reservations_stmt);
+            $row = mysqli_fetch_assoc($result);
+
+            if ($row['count'] > 0) {
+                $error = "Nelze smazat učebnu, která má aktivní rezervace.";
+            } else {
+                $delete_sql = "DELETE FROM classrooms WHERE id = ?";
+                $delete_stmt = mysqli_prepare($conn, $delete_sql);
+
+                if ($delete_stmt) {
+                    mysqli_stmt_bind_param($delete_stmt, "i", $classroom_id);
+
+                    if (mysqli_stmt_execute($delete_stmt)) {
+                        $success = "Učebna byla úspěšně smazána!";
+                    } else {
+                        $error = "Chyba při mazání učebny.";
+                    }
+                } else {
+                    $error = "Chyba při přípravě SQL dotazu pro mazání.";
+                }
+            }
+        }
+    } else {
+        $error = "Neplatné ID učebny.";
+    }
+}
 $classrooms_sql = "SELECT id, description FROM classrooms ORDER BY description";
 $classrooms_result = mysqli_query($conn, $classrooms_sql);
 $classrooms = [];
@@ -84,57 +109,9 @@ if ($classrooms_result) {
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
-    <title>Přidat učebnu - Reservation System</title>
+    <link rel="stylesheet" href="assets/discord-style.css">
+    <title>Přidat učebnu - Rezervační systém</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: "Roboto Mono", monospace;
-        }
-
-        body {
-            background-color: #1e2124;
-            color: white;
-            line-height: 1.6;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid #424549;
-        }
-
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            color: #ffffff;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .user-role {
-            background-color: #424549;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-size: 0.9rem;
-        }
-
         .content {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -142,87 +119,10 @@ if ($classrooms_result) {
         }
 
         .form-section, .list-section {
-            background-color: #424549;
-            border-radius: 12px;
+            background-color: #2f3136;
+            border-radius: 8px;
             padding: 2rem;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: bold;
-            color: #ffffff;
-        }
-
-        input {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 6px;
-            background-color: #1e2124;
-            color: white;
-            font-size: 1rem;
-            font-family: "Roboto Mono", monospace;
-        }
-
-        input:focus {
-            outline: 2px solid #8e44ad;
-        }
-
-        .button {
-            background-color: #8e44ad;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            padding: 12px 24px;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            width: 100%;
-            margin-bottom: 1rem;
-        }
-
-        .button:hover {
-            background-color: #9b59b6;
-        }
-
-        .back-link {
-            display: inline-block;
-            color: #8e44ad;
-            text-decoration: none;
-            font-weight: 500;
-            text-align: center;
-            width: 100%;
-        }
-
-        .back-link:hover {
-            text-decoration: underline;
-        }
-
-        .error {
-            background-color: #e74c3c;
-            color: white;
-            padding: 1rem;
-            border-radius: 6px;
-            margin-bottom: 1rem;
-            text-align: center;
-        }
-
-        .success {
-            background-color: #27ae60;
-            color: white;
-            padding: 1rem;
-            border-radius: 6px;
-            margin-bottom: 1rem;
-            text-align: center;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.24);
         }
 
         .classrooms-list {
@@ -231,7 +131,7 @@ if ($classrooms_result) {
         }
 
         .classroom-item {
-            background-color: #1e2124;
+            background-color: #40444b;
             padding: 1rem;
             margin-bottom: 0.5rem;
             border-radius: 6px;
@@ -241,13 +141,13 @@ if ($classrooms_result) {
         }
 
         .classroom-id {
-            color: #bbb;
+            color: #b9bbbe;
             font-size: 0.9rem;
         }
 
         .no-classrooms {
             text-align: center;
-            color: #bbb;
+            color: #b9bbbe;
             padding: 2rem;
         }
 
@@ -256,6 +156,7 @@ if ($classrooms_result) {
                 grid-template-columns: 1fr;
             }
         }
+
     </style>
 </head>
 <body>
@@ -269,7 +170,6 @@ if ($classrooms_result) {
         </header>
 
         <div class="content">
-            <!-- Formulář pro přidání učebny -->
             <div class="form-section">
                 <h2>Přidat novou učebnu</h2>
                 
@@ -289,13 +189,12 @@ if ($classrooms_result) {
                                value="<?php echo isset($description) ? htmlspecialchars($description) : ''; ?>">
                     </div>
                     
-                    <button type="submit" class="button">Přidat učebnu</button>
+                    <button type="submit" name="add_classroom" class="button">Přidat učebnu</button>
                 </form>
                 
                 <a href="dashboard.php" class="back-link">Zpět na dashboard</a>
             </div>
 
-            <!-- Seznam existujících učeben -->
             <div class="list-section">
                 <h2>Existující učebny (<?php echo count($classrooms); ?>)</h2>
                 
@@ -309,8 +208,15 @@ if ($classrooms_result) {
                             <div class="classroom-item">
                                 <div>
                                     <strong><?php echo htmlspecialchars($classroom['description']); ?></strong>
+                                    <div class="classroom-id">ID: <?php echo $classroom['id']; ?></div>
                                 </div>
-                                <div class="classroom-id">ID: <?php echo $classroom['id']; ?></div>
+                                <div>
+                                    <form method="post" style="display: inline;"
+                                          onsubmit="return confirm('Opravdu chcete smazat učebnu <?php echo htmlspecialchars($classroom['description']); ?>?');">
+                                        <input type="hidden" name="classroom_id" value="<?php echo $classroom['id']; ?>">
+                                        <button type="submit" name="delete_classroom" class="button danger">Smazat</button>
+                                    </form>
+                                </div>
                             </div>
                         <?php endforeach; ?>
                     <?php endif; ?>

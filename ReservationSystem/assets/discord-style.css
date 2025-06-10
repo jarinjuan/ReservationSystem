@@ -1,0 +1,370 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Roboto Mono", monospace;
+}
+
+body {
+    background-color: #36393f;
+    color: #dcddde;
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #40444b;
+}
+
+h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: #ffffff;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+h2 {
+    color: #ffffff;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    font-size: 1.3rem;
+}
+
+h3 {
+    color: #b9bbbe;
+    margin-bottom: 1rem;
+    font-weight: 500;
+}
+
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: #dcddde;
+}
+
+.user-role {
+    background-color: #5865f2;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 16px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+
+.content, .dashboard-content {
+    background-color: #2f3136;
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.24);
+}
+
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #b9bbbe;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-family: "Roboto Mono", monospace;
+    background-color: #40444b;
+    color: #dcddde;
+    transition: all 0.2s ease;
+}
+
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    background-color: #484c52;
+    box-shadow: 0 0 0 2px #5865f2;
+}
+
+input::placeholder, textarea::placeholder {
+    color: #72767d;
+}
+
+select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23dcddde' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    padding-right: 40px;
+}
+
+.button, button {
+    background-color: #5865f2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 12px 24px;
+    font-size: 1rem;
+    cursor: pointer;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.2s ease;
+    font-family: "Roboto Mono", monospace;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+}
+
+.button:hover, button:hover {
+    background-color: #4752c4;
+    transform: translateY(-1px);
+}
+
+.button:active, button:active {
+    background-color: #3c45a5;
+    transform: translateY(0);
+}
+
+.button.admin {
+    background-color: #5865f2;
+}
+
+.button.admin:hover {
+    background-color: #4752c4;
+}
+
+.button.danger {
+    background-color: #ed4245;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+}
+
+.button.danger:hover {
+    background-color: #c23616;
+}
+
+.button.logout {
+    background-color: #ed4245;
+}
+
+.button.logout:hover {
+    background-color: #c23616;
+}
+
+.actions {
+    margin-bottom: 2rem;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.error {
+    color: #ed4245;
+    background-color: rgba(237, 66, 69, 0.1);
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    font-weight: 500;
+    border-left: 4px solid #ed4245;
+    text-align: center;
+}
+
+.success {
+    color: #57f287;
+    background-color: rgba(87, 242, 135, 0.1);
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    font-weight: 500;
+    border-left: 4px solid #57f287;
+    text-align: center;
+}
+
+.reservation-card, .stat-card, .classroom-item, .user-card {
+    background-color: #40444b;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    border-left: 4px solid #5865f2;
+    transition: all 0.2s ease;
+}
+
+.reservation-card:hover, .classroom-item:hover, .user-card:hover {
+    background-color: #484c52;
+    transform: translateY(-1px);
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background-color: #40444b;
+    padding: 1.5rem;
+    border-radius: 8px;
+    text-align: center;
+    border-left: 4px solid #5865f2;
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #5865f2;
+}
+
+.stat-label {
+    color: #b9bbbe;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    background-color: #40444b;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+th, td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #36393f;
+}
+
+th {
+    background-color: #36393f;
+    font-weight: 600;
+    color: #ffffff;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.9rem;
+}
+
+tr:hover {
+    background-color: #484c52;
+}
+
+.status, .role-badge {
+    padding: 0.4rem 0.8rem;
+    border-radius: 16px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-pending {
+    background-color: #faa61a;
+    color: #2f3136;
+}
+
+.status-confirmed {
+    background-color: #57f287;
+    color: #2f3136;
+}
+
+.status-cancelled {
+    background-color: #ed4245;
+    color: white;
+}
+
+.role-admin {
+    background-color: #5865f2;
+    color: white;
+}
+
+.role-approver {
+    background-color: #72767d;
+    color: white;
+}
+
+.role-customer {
+    background-color: #b9bbbe;
+    color: #2f3136;
+}
+
+.role-reader {
+    background-color: #40444b;
+    color: white;
+}
+
+.back-link {
+    display: inline-block;
+    color: #5865f2;
+    text-decoration: none;
+    font-weight: 500;
+    text-align: center;
+    margin-top: 1rem;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+    color: #4752c4;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+    
+    header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+    
+    .actions {
+        flex-direction: column;
+    }
+    
+    .stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    h1 {
+        font-size: 2rem;
+    }
+    
+    table {
+        font-size: 0.9rem;
+    }
+    
+    th, td {
+        padding: 0.5rem;
+    }
+}
